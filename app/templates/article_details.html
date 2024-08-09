@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}{{post.title_tag}}{% endblock %}
+{% block content %}
+<h1>{{post.title}} - {{post.author.id}}</h1>
+<small>By: {{post.author.first_name}} {{post.author.last_name}} - 
+    {{post.created_at}} 
+    {% if user.is_authenticated %}
+    {% if user.id == post.author.id %}
+    - <a href="{% url 'update_post' post.pk %}">Edit</a> - 
+    <a href="{% url 'delete_post' post.pk %}">Delete</a></small><br/>
+    {% endif %}
+    {% endif %}
+<br>
+<br/>
+{{post.body|safe}}
+
+<br/><br/>
+<a href="{% url 'home' %}" class="btn btn-secondary">Back</a>
+
+<br/><br/>
+<hr>
+<br/>
+<form action="{% url 'like_post' post.pk %}" method="POST">
+    {% csrf_token %}
+    <button type="submit", name="post_id", value="{{ post.id }}", class="btn btn-primary btn-sm">Like</button>
+</form>
+<form action="{% url 'like_post' post.pk %}" method="POST">
+    {% csrf_token %}
+    {% if user.is_authenticated %}
+        {% if liked %}
+            <button type="submit" name="post_id" value="{{ post.id }}" class="btn btn-danger btn-sm">Unlike</button>&nbsp;
+        {% else %}
+            <button type="submit" name="post_id" value="{{ post.id }}" class="btn btn-primary btn-sm">Like</button>
+        {% endif %}
+    {% else %}
+        <small><a href="{% url 'login' %}">Login to like posts</a></small>
+    {% endif %}
+    - {{ total_likes }} Likes
+</form>
+
+<hr>
+<h3>Comments</h3>
+{% if user.is_authenticated %}
+    <form method="post">
+        {% csrf_token %}
+        {{ comment_form.as_p }}
+        <button type="submit" class="btn btn-primary">Add comment</button>
+    </form>
+{% else %}
+    <p>Please <a href="{% url 'login' %}">login</a> to add a comment.</p>
+{% endif %}
+
+{% for comment in comments %}
+    <div class="card mt-2">
+        <div class="card-body">
+            <h6 class="card-subtitle mb-2 text-muted">{{ comment.user.username }} - {{ comment.created_at|date:"F d, Y" }}</h6>
+            <p class="card-text">{{ comment.content }}</p>
+        </div>
+    </div>
+{% empty %}
+    <p>No comments yet.</p>
+{% endfor %}
+{% endblock %}

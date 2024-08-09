@@ -2,7 +2,7 @@
     "builds": [{
         "src": "blog1/wsgi.py",
         "use": "@vercel/python",
-        "config": { "maxLambdaSize": "15mb", "runtime": "python8.0.33" }
+        "config": { "maxLambdaSize": "15mb", "runtime": "python4.2.13" }
     }],
     "routes": [
         {
